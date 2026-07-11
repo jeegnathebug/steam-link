@@ -32,24 +32,6 @@ function createAnchor(id, extraStyles) {
   return anchor;
 }
 
-function main() {
-  const gamePageMatch = window.location.pathname.includes("app");
-  const wishlistPageMatch = window.location.pathname.includes("wishlist");
-
-  if (gamePageMatch) {
-    addLinkToGamePage();
-  } else if (wishlistPageMatch) {
-    // observe wishlist page because it refreshes and lazy loads
-    const observer = new MutationObserver(() => {
-      addLinksToWishListPage();
-    });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  }
-}
-
 function addLinkToGamePage() {
   const id = getIdFromHref(window.location);
 
@@ -69,7 +51,7 @@ function addLinksToWishListPage() {
       return;
     }
 
-    const parent = pageAnchor.closest(".Panel");;
+    const parent = pageAnchor.closest(".Panel");
 
     if (!parent) {
       return;
@@ -89,6 +71,22 @@ function addLinksToWishListPage() {
     const anchor = createAnchor(id, { position: "absolute" });
     parent.appendChild(anchor);
   });
+}
+
+function main() {
+  const gamePageMatch = window.location.pathname.includes("app");
+  const wishlistPageMatch = window.location.pathname.includes("wishlist");
+
+  if (gamePageMatch) {
+    addLinkToGamePage();
+  } else if (wishlistPageMatch) {
+    // observe wishlist page because it refreshes and lazy loads
+    const observer = new MutationObserver(addLinksToWishListPage);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
 }
 
 main();
